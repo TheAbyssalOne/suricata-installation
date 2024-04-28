@@ -18,7 +18,7 @@ check_root() {
 
 check_update() {
 
-	sudo apt update
+	apt update
 }
 
 check_iface() {
@@ -42,22 +42,22 @@ check_iface() {
 install_suricata() {
 	
 	# install dependencies
-	sudo apt -y install libpcre3 libpcre3-dbg libpcre3-dev build-essential autoconf automake libtool libpcap-dev \
+	apt -y install libpcre3 libpcre3-dbg libpcre3-dev build-essential autoconf automake libtool libpcap-dev \
 	libnet1-dev libyaml-0-2 libyaml-dev zlib1g zlib1g-dev libmagic-dev libcap-ng-dev libjansson4 libjansson-dev pkg-config \
 	rustc cargo libnetfilter-queue-dev geoip-bin geoip-database geoipupdate apt-transport-https libnetfilter-queue-dev \
         libnetfilter-queue1 libnfnetlink-dev tcpreplay curl
 
 	# install with ubuntu package
-	sudo add-apt-repository -y ppa:oisf/suricata-stable
-	sudo apt update
-	sudo apt -y install suricata
+	add-apt-repository -y ppa:oisf/suricata-stable
+	apt update -y
+	apt -y install suricata
 	
 	# stop suricata
-	sudo systemctl stop suricata
+	systemctl stop suricata
 
 	# config suricata
-	sudo mv /etc/suricata/suricata.yaml /etc/suricata/suricata.yaml.bak
-	sudo cp conf/suricata.yaml /etc/suricata/
+	mv /etc/suricata/suricata.yaml /etc/suricata/suricata.yaml.bak
+	cp conf/suricata.yaml /etc/suricata/
 	sed -i "s/CHANGE-IFACE/$LIFACE/g" /etc/suricata/suricata.yaml
 
 	# add support for cloud server type
@@ -75,22 +75,22 @@ install_suricata() {
 	# update suricata rules with 'suricata-update' command
 	# currently using rules source from 'Emerging Threats Open Ruleset'
 	# -D command to specify directory from default value '/var/lib/suricata' to '/etc/suricata/'
-	sudo suricata-update -D /etc/suricata/ enable-source et/open
-	sudo suricata-update -D /etc/suricata/ update-sources
+	suricata-update -D /etc/suricata/ enable-source et/open
+	suricata-update -D /etc/suricata/ update-sources
 	# --no-merge command 'Do not merge the rules into a single rule file'
 	# Detail on suricata-update command 'https://suricata-update.readthedocs.io/en/latest/update.html'
-	sudo suricata-update -D /etc/suricata/ --no-merge
+	suricata-update -D /etc/suricata/ --no-merge
 
 
 	# enable suricata at startup
-	sudo systemctl enable suricata
+	systemctl enable suricata
 
 	# start suricata
-	sudo systemctl start suricata
+	systemctl start suricata
 
 	# print suricata version
 	suricata -V
-	sudo systemctl restart suricata
+	systemctl restart suricata
 	echo "Suricata has been installed and configured."
 	echo "Suricata is monitoring on interface $LIFACE."
 	echo "Please refer to the Suricata documentation for further configuration."
@@ -118,5 +118,3 @@ main() {
 }
 
 main
-
-
