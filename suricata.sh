@@ -82,6 +82,15 @@ install_suricata() {
 
 	# print suricata version
 	suricata -V
+	sudo systemctl restart suricata
+	echo "Suricata has been installed and configured."
+	echo "Suricata is monitoring on interface $LIFACE."
+	echo "Please refer to the Suricata documentation for further configuration."
+
+	# testing suricata with testmyids rule
+	curl http://testmynids.org/uid/index.html
+	echo "checking suricata log, exit with ctrl+c"
+	tail -f /var/log/suricata/fast.log	
 
 }
 
