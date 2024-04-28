@@ -1,4 +1,12 @@
 #!/bin/bash
+# Written by NN-DF & G.P.Aramu
+# Version 1.0
+# This script is to install Suricata on Ubuntu 22.04 LTS
+# Suricata is a free and open source, mature, fast and robust network threat detection engine
+# The script will install Suricata with the latest version and configure it to monitor on the specified interface
+# The script will also update the Suricata rules with the latest rules from Emerging Threats Open Ruleset
+# The script will also test Suricata with testmyids rule
+
 set -euo pipefail
 
 check_root() {
@@ -37,7 +45,7 @@ install_suricata() {
 	sudo apt -y install libpcre3 libpcre3-dbg libpcre3-dev build-essential autoconf automake libtool libpcap-dev \
 	libnet1-dev libyaml-0-2 libyaml-dev zlib1g zlib1g-dev libmagic-dev libcap-ng-dev libjansson4 libjansson-dev pkg-config \
 	rustc cargo libnetfilter-queue-dev geoip-bin geoip-database geoipupdate apt-transport-https libnetfilter-queue-dev \
-        libnetfilter-queue1 libnfnetlink-dev tcpreplay
+        libnetfilter-queue1 libnfnetlink-dev tcpreplay curl
 
 	# install with ubuntu package
 	sudo add-apt-repository -y ppa:oisf/suricata-stable
