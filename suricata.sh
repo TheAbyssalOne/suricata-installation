@@ -6,6 +6,12 @@
 # The script will install Suricata with the latest version and configure it to monitor on the specified interface
 # The script will also update the Suricata rules with the latest rules from Emerging Threats Open Ruleset
 # The script will also test Suricata with testmyids rule
+# https://evebox.org/docs/install/debian
+# https://docs.suricata.io/en/latest/install.html
+# execute the script with root privilege
+# evebox server -D . --datastore sqlite --host 0.0.0.0 --input /var/log/suricata/eve.json for evebox server configuration on localhost suricata server
+# credentials for evebox server: wil be generated and shown on the terminal after evebox server installation
+
 
 set -euo pipefail
 
