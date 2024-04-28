@@ -102,6 +102,18 @@ install_suricata() {
 
 }
 
+install evebox() {
+	# install evebox When started from systemd, the EveBox server will run as the user evebox which has write access to /var/lib/evebox.
+	apt-get install wget gnupg apt-transport-https
+	wget -qO - https://evebox.org/files/GPG-KEY-evebox | sudo apt-key add -
+	echo "deb http://evebox.org/files/debian stable main" | sudo tee /etc/apt/sources.list.d/evebox.list
+	apt-get update -y
+	apt -y install evebox
+	systemctl enable evebox
+	systemctl start evebox
+	echo "Evebox has been installed and started."
+}
+
 main() {
 
 	#check root
@@ -115,6 +127,10 @@ main() {
 
 	# install suricata 
 	install_suricata	
+
+	# install evebox
+	install evebox
+	
 }
 
 main
