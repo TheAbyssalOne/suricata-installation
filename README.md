@@ -1,5 +1,5 @@
 ## This script for installation suricata on ubuntu 22.04
-
+# Credits to NN-DF for the script
 ## Requirements
 - **Ubuntu** desktop/server LTS (22.04) with fresh installation
 - Working internet connection
