@@ -12,6 +12,17 @@
 # adapter must be in promiscuous mode, set it with 'ip link set <adapter> promisc on'
 # evebox server -D . --datastore sqlite --host 0.0.0.0 --input /var/log/suricata/eve.json for evebox server configuration on localhost suricata server
 # credentials for evebox server: wil be generated and shown on the terminal after evebox server installation
+# enable all rules sources with the following commands
+# sudo suricata-update enable-source et/open && \
+# sudo suricata-update enable-source oisf/trafficid && \
+# sudo suricata-update enable-source sslbl/ssl-fp-blacklist && \
+# sudo suricata-update enable-source sslbl/ja3-fingerprints && \
+# sudo suricata-update enable-source etnetera/aggressive && \
+# sudo suricata-update enable-source tgreen/hunting && \
+# sudo suricata-update enable-source malsilo/win-malware && \
+# sudo suricata-update enable-source stamus/lateral && \
+# sudo suricata-update enable-source pawpatrules
+
 
 
 set -euo pipefail
