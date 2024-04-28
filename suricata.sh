@@ -9,6 +9,7 @@
 # https://evebox.org/docs/install/debian
 # https://docs.suricata.io/en/latest/install.html
 # execute the script with root privilege
+# adapter must be in promiscuous mode, set it with 'ip link set <adapter> promisc on'
 # evebox server -D . --datastore sqlite --host 0.0.0.0 --input /var/log/suricata/eve.json for evebox server configuration on localhost suricata server
 # credentials for evebox server: wil be generated and shown on the terminal after evebox server installation
 
@@ -42,6 +43,12 @@ check_iface() {
 	
 		echo "Which Interface you want suricata to Listen(captured)?"
 		read -p "Interface: " LIFACE
+		# adapter must be in promiscuous mode, set it with 'ip link set <adapter> promisc on'
+		# check if the interface is in promiscuous mode
+		# che check if the interface is in promiscuous mode
+		IPROM=$(ip link show $LIFACE | grep -i "PROMISC" | wc -l)
+		# set promiscuous mode on the interface
+		ip link set $LIFACE promisc on
 	fi
 }
 
