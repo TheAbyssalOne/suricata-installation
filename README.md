@@ -1,7 +1,7 @@
-## This script for installation suricata on ubuntu 16.04,18.04,20.04 and 22.04
+## This script for installation suricata on ubuntu 22.04
 
 ## Requirements
-- **Ubuntu** desktop/server LTS (22.04,20.04/18.04/16.04) with fresh installation
+- **Ubuntu** desktop/server LTS (22.04) with fresh installation
 - Working internet connection
 
 ## How to run
@@ -12,7 +12,7 @@ sudo bash suricata.sh
 ```
 
 ### Detail installation
-- Will install latest version suricata. [current 6.0.8 (06-November-2022) ]
+- Will install latest version suricata. current 7.0.5 - 28-04-2024
 - Log location /var/log/suricata/
 - Rules location /etc/suricata/rules/
 
