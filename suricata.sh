@@ -25,6 +25,7 @@
 
 
 
+
 set -euo pipefail
 
 check_root() {
@@ -69,7 +70,7 @@ install_suricata() {
 	apt -y install libpcre3 libpcre3-dbg libpcre3-dev build-essential autoconf automake libtool libpcap-dev \
 	libnet1-dev libyaml-0-2 libyaml-dev zlib1g zlib1g-dev libmagic-dev libcap-ng-dev libjansson4 libjansson-dev pkg-config \
 	rustc cargo libnetfilter-queue-dev geoip-bin geoip-database geoipupdate apt-transport-https libnetfilter-queue-dev \
-        libnetfilter-queue1 libnfnetlink-dev tcpreplay curl
+    libnetfilter-queue1 libnfnetlink-dev tcpreplay curl
 
 	# install with ubuntu package
 	add-apt-repository -y ppa:oisf/suricata-stable
