@@ -24,8 +24,6 @@
 # sudo suricata-update enable-source pawpatrules
 
 
-
-
 set -euo pipefail
 
 check_root() {
