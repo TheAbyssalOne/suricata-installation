@@ -1,17 +1,19 @@
 #!/bin/bash
-# Written by NN-DF & G.P.Aramu
-# Version 1.0
-# This script is to install Suricata on Ubuntu 22.04 LTS
-# Suricata is a free and open source, mature, fast and robust network threat detection engine
-# The script will install Suricata with the latest version and configure it to monitor on the specified interface
-# The script will also update the Suricata rules with the latest rules from Emerging Threats Open Ruleset
+# Written by Giovanni Aramu
+# Version 0.5
+# This script will install Suricata on RHEL, Alma & Rocky Linux 9
+# the script will set an adapter in promiscuous mode to monitor for all traffic
+# The script will update the Suricata rules to the latest Emerging Threats Open Ruleset
 # The script will also test Suricata with testmyids rule
-# https://evebox.org/docs/install/debian
-# https://docs.suricata.io/en/latest/install.html
-# execute the script with root privilege
-# adapter must be in promiscuous mode, set it with 'ip link set <adapter> promisc on'
-# evebox server -D . --datastore sqlite --host 0.0.0.0 --input /var/log/suricata/eve.json for evebox server configuration on localhost suricata server
-# credentials for evebox server: wil be generated and shown on the terminal after evebox server installation
+# Suricata is pre-configured to run as the suricata user.
+# Command line parameters such as providing the interface names can be configured in /etc/sysconfig/suricata.
+# Users can run suricata-update without being root provided they are added to the suricata group.
+
+######################################### Suricata Comments #####################################
+# Directories:
+# /etc/suricata: Configuration directory
+# /var/log/suricata: Log directory
+# /var/lib/suricata: State directory rules, datasets.
 # enable all rules sources with the following commands
 # sudo suricata-update enable-source et/open && \
 # sudo suricata-update enable-source oisf/trafficid && \
@@ -22,6 +24,17 @@
 # sudo suricata-update enable-source malsilo/win-malware && \
 # sudo suricata-update enable-source stamus/lateral && \
 # sudo suricata-update enable-source pawpatrules
+
+######################################### Evebox Comments ######################################
+# https://evebox.org/docs/install/debian
+# https://docs.suricata.io/en/latest/install.html
+# execute the script with root privilege
+# adapter must be in promiscuous mode, set it with 'ip link set <addnfer> promisc on'
+# evebox server -D . --datastore sqlite --host 0.0.0.0 --input /var/log/suricata/eve.json for evebox server configuration on localhost suricata server
+# credentials for evebox server: wil be generated and shown on the terminal after evebox server installation in admin:password format
+
+  
+set -euo pipefail
 
 cat << "EOF" 
   ____                _              _           _____                
@@ -42,9 +55,6 @@ cat << "EOF"
          |___/        
 EOF
 
-
-set -euo pipefail
-
 check_root() {
 	if [[ $EUID -ne 0 ]]; then
 	   echo "[-] This script must be run as root"
@@ -53,8 +63,15 @@ check_root() {
 }
 
 check_update() {
+	dnf update
+}
 
-	apt update
+check_sudo() {
+	# check sudo installation
+	if ! [ -x "$(command -v sudo)" ]; then
+		echo "sudo is not installed, installing sudo"
+		dnf install -y sudo
+	fi
 }
 
 check_iface() {
@@ -66,53 +83,49 @@ check_iface() {
 	else
 		for iface in $IfaceAll
 		do 
-			echo "Available interface: "$iface
+			echo "Available interface: ""$iface"
 		done
 		echo ""
 	
-		echo "Which Interface you want suricata to Listen(captured)?"
+		echo "Which Interface you want suricata to Listen(cdnfured)?"
 		read -p "Interface: " LIFACE
-		# adapter must be in promiscuous mode, set it with 'ip link set <adapter> promisc on'
+		# adapter can be set to promiscuous mode to monitor all traffic, not just traffic to the host, set it with 'ip link set <adapter> promisc on'
 		# check if the interface is in promiscuous mode
-		# che check if the interface is in promiscuous mode
 		IPROM=$(ip link show $LIFACE | grep -i "PROMISC" | wc -l)
+		if [[ $IPROM -eq 0 ]]; then
+
+		
 		# set promiscuous mode on the interface
-		ip link set $LIFACE promisc on
+		ip link set dev $LIFACE promisc on
 	fi
 }
 
 install_suricata() {
 	
-	# install dependencies
-	apt -y install libpcre3 libpcre3-dbg libpcre3-dev build-essential autoconf automake libtool libpcap-dev \
-	libnet1-dev libyaml-0-2 libyaml-dev zlib1g zlib1g-dev libmagic-dev libcap-ng-dev libjansson4 libjansson-dev pkg-config \
-	rustc cargo libnetfilter-queue-dev geoip-bin geoip-database geoipupdate apt-transport-https libnetfilter-queue-dev \
-    libnetfilter-queue1 libnfnetlink-dev tcpreplay curl
-
-	# install with ubuntu package
-	add-apt-repository -y ppa:oisf/suricata-stable
-	apt update -y
-	apt -y install suricata
-	
-	# stop suricata
+	# install with RPM package
+	dnf install -y epel-release dnf-plugins-core
+	dnf copr enable @oisf/suricata-7.0
+	dnf update -y
+	dnf -y install suricata
 	systemctl stop suricata
+	systemctl enable suricata
 
-	# config suricata
-	mv /etc/suricata/suricata.yaml /etc/suricata/suricata.yaml.bak
-	cp conf/suricata.yaml /etc/suricata/
-	sed -i "s/CHANGE-IFACE/$LIFACE/g" /etc/suricata/suricata.yaml
+	# # config suricata
+	# mv /etc/suricata/suricata.yaml /etc/suricata/suricata.yaml.bak
+	# cp conf/suricata.yaml /etc/suricata/
+	# sed -i "s/CHANGE-IFACE/$LIFACE/g" /etc/suricata/suricata.yaml
 
-	# add support for cloud server type
-	PUBLIC=$(curl -s ifconfig.me)
-	LOCAL=$(hostname -I | cut -d' ' -f1)
-	DEFIP="192.168.0.0/16,10.0.0.0/8,172.16.0.0/12"
-	LOCIP="$LOCAL/24"
+	# # add support for cloud server type
+	# PUBLIC=$(curl -s ifconfig.me)
+	# LOCAL=$(hostname -I | cut -d' ' -f1)
+	# DEFIP="192.168.0.0/16,10.0.0.0/8,172.16.0.0/12"
+	# LOCIP="$LOCAL/24"
 
-	if [[ $LOCAL = $PUBLIC ]];then
-		sed -i "s~IP-ADDRESS~$LOCIP~" /etc/suricata/suricata.yaml
-	else
-		sed -i "s~IP-ADDRESS~$DEFIP~" /etc/suricata/suricata.yaml
-	fi
+	# if [[ $LOCAL = $PUBLIC ]];then
+	# 	sed -i "s~IP-ADDRESS~$LOCIP~" /etc/suricata/suricata.yaml
+	# else
+	# 	sed -i "s~IP-ADDRESS~$DEFIP~" /etc/suricata/suricata.yaml
+	# fi
 	
 	# update suricata rules with 'suricata-update' command
 	# currently using rules source from 'Emerging Threats Open Ruleset'
@@ -132,7 +145,7 @@ install_suricata() {
 
 	# print suricata version
 	suricata -V
-	systemctl restart suricata
+	systemctl reload-or-restart suricata
 	echo "Suricata has been installed and configured."
 	echo "Suricata is monitoring on interface $LIFACE."
 	echo "Please refer to the Suricata documentation for further configuration."
@@ -146,11 +159,9 @@ install_suricata() {
 
 install_evebox() {
 	# install evebox When started from systemd, the EveBox server will run as the user evebox which has write access to /var/lib/evebox.
-	apt-get install wget gnupg apt-transport-https
-	wget -qO - https://evebox.org/files/GPG-KEY-evebox | sudo apt-key add -
-	echo "deb http://evebox.org/files/debian stable main" | sudo tee /etc/apt/sources.list.d/evebox.list
-	apt-get update -y
-	apt -y install evebox
+	rpm -Uvh https://evebox.org/files/rpm/stable/evebox-release.noarch.rpm
+	dnf update -y
+	yum install -y evebox
 	systemctl enable evebox
 	systemctl start evebox
 	echo "Evebox has been installed and started."
@@ -160,6 +171,9 @@ main() {
 
 	#check root
 	check_root
+
+	# check sudo installation
+	check_sudo
 
 	# update
 	check_update
